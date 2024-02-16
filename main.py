@@ -148,11 +148,9 @@ pipe.to("cuda:0")
 # Load the conditioning image
 # image = load_image("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/svd/rocket.png?download=true")
 # image = Image.open("assets/rocket.png")
-image = Image.open("validation_images/chair.png")
-image = image.resize((1024, 576))
+image = Image.open("validation_images/chair.jpeg.jpg")
 
-mask_image = Image.open("assets/rocket_mask.png")
-mask_image = mask_image.resize((1024, 576))
+mask_image = Image.open("validation_images/mask_SwinIR.png")
 
 def callback(pipe, i, j, dict):
   latents = dict["latents"]
@@ -173,17 +171,13 @@ def callback(pipe, i, j, dict):
 
   return dict
 
-validation_control_images = load_images_from_folder_to_pil("validation_images/depth")
-
-
 generator = torch.manual_seed(42)
 frames = pipe(image,
-              mask_image=None,
+              mask_image=mask_image,
               add_predicted_noise=False,
               decode_chunk_size=1,
               generator=generator,
               num_inference_steps=20,
-              controlnet_condition=None, # validation_control_images[:14],
               num_frames=14,
               callback_on_step_end=None).frames[0]
 
